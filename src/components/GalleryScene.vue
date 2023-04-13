@@ -1,4 +1,5 @@
 <template>
+  <LoadingScreen ref="loading" />
   <canvas ref="canvas" />
 </template>
 
@@ -28,11 +29,13 @@ import {
   Color3,
   StandardMaterial,
   Texture,
-  Matrix
+  Matrix,
+  Sound
 } from '@babylonjs/core'
 import '@babylonjs/loaders'
 import devnull from '../scripts/devnull'
 import interactivePaintings from '../assets/links.json'
+import LoadingScreen, { type LoadingScreenType } from './LoadingScreen.vue'
 
 const ctx: ComponentInternalInstance = getCurrentInstance() as ComponentInternalInstance
 
@@ -53,9 +56,10 @@ class Metaverse {
   private camera: FreeCamera
   private highlightLayer: HighlightLayer | null = null
 
-  constructor(private canvas: HTMLCanvasElement, private loader: HTMLDivElement) {
+  constructor(private canvas: HTMLCanvasElement, private loadingScreen: LoadingScreenType) {
     this.engine = this.createEngine()
     this.scene = this.createScene()
+    this.initSounds()
     this.initLights()
     this.initEnvironment()
     this.camera = this.createCamera()
@@ -74,8 +78,8 @@ class Metaverse {
     })
     // prevent the default context menu
     this.canvas.addEventListener('contextmenu', (event) => event.preventDefault())
-    // show the loading screen
-    engine.displayLoadingUI()
+    // change the loading screen
+    engine.loadingScreen = this.loadingScreen.createLoadingScreen()
     return engine
   }
 
@@ -150,7 +154,10 @@ class Metaverse {
       '/models/gallery/',
       'scene.gltf',
       this.scene,
-      null,
+      (evt) => {
+        const percentComplete: number = (evt.loaded * 100) / evt.total
+        this.loadingScreen.updateProgress(percentComplete.toFixed(0))
+      },
       '.gltf'
     )
 
@@ -183,6 +190,35 @@ class Metaverse {
 
     // render the scene
     this.render()
+  }
+
+  private initSounds(): void {
+    new Sound('jazz', '/audio/background.mp3', this.scene, null, {
+      loop: true,
+      autoplay: true,
+      volume: 0.2
+    })
+
+    new Sound('footsteps', '/audio/footsteps.mp3', this.scene, null, {
+      loop: true,
+      autoplay: false
+    })
+  }
+
+  private checkSounds(lastPosition: Vector3): void {
+    const footsteps = this.scene.getSoundByName('footsteps')
+    if (footsteps) {
+      const isMoving = this.camera.position.subtract(lastPosition).length() !== 0
+      if (isMoving && !footsteps.isPlaying) {
+        if (Engine.audioEngine) Engine.audioEngine!.unlock()
+        footsteps.setVolume(0.1)
+        footsteps.play()
+      }
+      if (!isMoving && footsteps.isPlaying) {
+        while (footsteps.getVolume() > 0.0001) footsteps.setVolume(footsteps.getVolume() - 0.0001)
+        footsteps.stop()
+      }
+    }
   }
 
   private initLights(): void {
@@ -227,14 +263,17 @@ class Metaverse {
     // hide the loading screen
     this.canvas.focus()
     this.engine.hideLoadingUI()
+    var lastPosition: Vector3 = this.camera.position.clone()
     // render the scene
     this.engine.runRenderLoop((): void => {
+      this.checkSounds(lastPosition)
+      lastPosition = this.camera.position.clone()
       this.scene.render()
     })
   }
 }
 
 onMounted(() => {
-  new Metaverse(ctx.refs.canvas as HTMLCanvasElement, ctx.refs.loading as HTMLDivElement)
+  new Metaverse(ctx.refs.canvas as HTMLCanvasElement, ctx.refs.loading as LoadingScreenType)
 })
 </script>
