@@ -1,13 +1,59 @@
 <template>
   <LoadingScreen ref="loading" />
   <canvas ref="canvas" />
+
+  <div ref="welcome" class="welcome">
+    <h1 class="text name">GALLERY</h1>
+    <p class="text description">Interactive & immersive exhibition of my certs</p>
+  </div>
 </template>
 
 <style scoped>
 canvas {
   width: 100%;
   height: 100%;
-  background-color: #f0f;
+  background-color: #aaa;
+}
+.welcome {
+  z-index: 5;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  background-color: #837d7de2;
+  padding: 50px 100px;
+  border-radius: 3px;
+  transition: opacity 1s ease-in-out;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+.text {
+  position: relative;
+  font-family: 'Montserrat';
+  font-size: 6rem;
+  white-space: nowrap;
+  color: #fff;
+  width: fit-content;
+}
+.name {
+  text-transform: uppercase;
+}
+.welcome .name::after {
+  content: '';
+  position: absolute;
+  background: #fff;
+  left: 0%;
+  transform: translate(calc(-1 * var(--mg-left)), -50%);
+  bottom: 0;
+  width: 60px;
+  height: 2px;
+}
+.welcome .description {
+  font-size: 2rem;
+  font-weight: 500;
 }
 </style>
 
@@ -56,7 +102,11 @@ class Metaverse {
   private camera: FreeCamera
   private highlightLayer: HighlightLayer | null = null
 
-  constructor(private canvas: HTMLCanvasElement, private loadingScreen: LoadingScreenType) {
+  constructor(
+    private canvas: HTMLCanvasElement,
+    private loadingScreen: LoadingScreenType,
+    private welcome: HTMLElement | null
+  ) {
     this.engine = this.createEngine()
     this.scene = this.createScene()
     this.initSounds()
@@ -209,6 +259,10 @@ class Metaverse {
     const footsteps = this.scene.getSoundByName('footsteps')
     if (footsteps) {
       const isMoving = this.camera.position.subtract(lastPosition).length() !== 0
+      if (isMoving && this.welcome !== null) {
+        this.welcome.style.opacity = '0'
+        this.welcome = null
+      }
       if (isMoving && !footsteps.isPlaying) {
         if (Engine.audioEngine) Engine.audioEngine!.unlock()
         footsteps.setVolume(0.1)
@@ -263,6 +317,7 @@ class Metaverse {
     // hide the loading screen
     this.canvas.focus()
     this.engine.hideLoadingUI()
+
     var lastPosition: Vector3 = this.camera.position.clone()
     // render the scene
     this.engine.runRenderLoop((): void => {
@@ -274,6 +329,10 @@ class Metaverse {
 }
 
 onMounted(() => {
-  new Metaverse(ctx.refs.canvas as HTMLCanvasElement, ctx.refs.loading as LoadingScreenType)
+  new Metaverse(
+    ctx.refs.canvas as HTMLCanvasElement,
+    ctx.refs.loading as LoadingScreenType,
+    ctx.refs.welcome as HTMLElement
+  )
 })
 </script>

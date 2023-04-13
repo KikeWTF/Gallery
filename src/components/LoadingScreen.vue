@@ -7,7 +7,9 @@
         <rect x="20" y="38" width="20" height="40" transform="rotate(-45, 70, 20)" />
       </svg>
       <p id="progress">0%</p>
+      <br />
     </div>
+    <p class="tip">(Press keys to move)</p>
   </div>
 </template>
 <style scoped>
@@ -18,6 +20,21 @@ p {
   margin: 10px auto;
   text-align: center;
 }
+.tip {
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: #56585e;
+  margin: 50px auto;
+  text-align: center;
+}
+@media screen and (max-width: 768px) {
+  p {
+    font-size: 1.2rem;
+  }
+  .tip {
+    display: none;
+  }
+}
 #loading {
   position: absolute;
   z-index: 10;
@@ -25,10 +42,11 @@ p {
   left: 0;
   display: flex;
   background-color: #f5f9ff;
-  width: 100%;
-  height: 100%;
+  width: 100vw;
+  height: 100vh;
   justify-content: center;
   align-items: center;
+  flex-direction: column;
   opacity: 1;
   transition: opacity 1s ease-in-out;
 }
