@@ -1,0 +1,11 @@
+version: "3.8"
+
+services:
+  gallery:
+    build:
+      context: gallery
+      dockerfile: Dockerfile
+    container_name: gallery
+    restart: unless-stopped
+    ports:
+      - 8081:80
