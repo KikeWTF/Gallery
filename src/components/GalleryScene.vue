@@ -79,8 +79,8 @@ import {
   Sound
 } from '@babylonjs/core'
 import '@babylonjs/loaders'
-import devnull from '../scripts/devnull'
-import interactivePaintings from '../assets/links.json'
+import devnull from '@/scripts/devnull'
+import interactivePaintings from '@/assets/links.json'
 import LoadingScreen, { type LoadingScreenType } from './LoadingScreen.vue'
 
 const ctx: ComponentInternalInstance = getCurrentInstance() as ComponentInternalInstance

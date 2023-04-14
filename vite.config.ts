@@ -9,6 +9,9 @@ export default defineConfig({
   optimizeDeps: {
     exclude: ['js-big-decimal']
   },
+  build: {
+    outDir: './www'
+  },
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))

@@ -1,9 +1,9 @@
-version: "3.8"
+version: '3.8'
 
 services:
   gallery:
     build:
-      context: gallery
+      context: .
       dockerfile: Dockerfile
     container_name: gallery
     restart: unless-stopped
