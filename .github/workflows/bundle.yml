@@ -1,19 +1,25 @@
 name: Create a new bundle
+
 on:
   push:
     branches: [main]
+  workflow_dispatch:
+
 jobs:
   zip:
     runs-on: ubuntu-latest
     steps:
+      # Checkout the repository
       - name: Checkout the repository
         uses: actions/checkout@v3
+      # Build the project
       - name: Install the dependencies
         run: npm install
       - name: Lint and format the code
         run: npm run lint && npm run format
       - name: Build the project
         run: npm run build
+      # Create the bundle
       - name: Create a new bundle directory
         run: mkdir -p bundle
       - name: Copy all the files and folders to the bundle directory
