@@ -2,8 +2,10 @@ version: '3.8'
 
 services:
   gallery:
-    image: httpd:alpine
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: gallery
     restart: unless-stopped
-    ports: [80:80]
-    volumes: [./www:/usr/local/apache2/htdocs]
+    ports:
+      - 8081:80
