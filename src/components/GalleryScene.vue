@@ -113,13 +113,13 @@ class Metaverse {
     this.initLights()
     this.initEnvironment()
     this.camera = this.createCamera()
-    this.initVR()
+    this.initEvents()
   }
 
   private createEngine(): Engine {
     const canvas: HTMLCanvasElement = this.canvas
     const engine: Engine = devnull(
-      () => new Engine(canvas, true, { preserveDrawingBuffer: true, stencil: true })
+      () => new Engine(canvas, true, { adaptToDeviceRatio: true, stencil: true })
     )
     // resize the canvas when the window is resized
     engine.resize()
@@ -161,13 +161,34 @@ class Metaverse {
     return camera
   }
 
+  private initEvents(): void {
+    this.scene.onPointerDown = () => {
+      if (this.welcome) {
+        this.welcome.style.opacity = '0'
+        setTimeout(() => {
+          if (this.welcome) this.welcome.style.display = 'none'
+        }, 1000)
+      }
+      if (!this.engine.isPointerLock) this.engine.enterPointerlock()
+    }
+    this.scene.onPointerUp = () => {
+      if (this.welcome) {
+        this.welcome.style.opacity = '0'
+        setTimeout(() => {
+          if (this.welcome) this.welcome.style.display = 'none'
+        }, 1000)
+      }
+      if (this.engine.isPointerLock) this.engine.exitPointerlock()
+    }
+  }
+
   private addInteraction(mesh: Mesh, link: string): void {
     // create the highlight layer
     if (!this.highlightLayer) this.highlightLayer = new HighlightLayer('highlight', this.scene)
     // add the actions to the mesh
     mesh.actionManager = new ActionManager(this.scene)
     mesh.actionManager.registerAction(
-      new ExecuteCodeAction(ActionManager.OnPickDownTrigger, () => {
+      new ExecuteCodeAction(ActionManager.OnRightPickTrigger, () => {
         if (!this.isSomethingBetween(mesh)) window.open(link, '_blank', 'noopener')
       })
     )
@@ -300,17 +321,6 @@ class Metaverse {
     sky.material = skyMaterial
     sky.rotation.x = Math.PI / 2
     sky.position.y = 20
-  }
-
-  private async initVR(): Promise<void> {
-    // TODO: Test this on a mobile device
-    try {
-      await this.scene.createDefaultXRExperienceAsync({
-        floorMeshes: [this.scene.getMeshByName('floor_collider')!]
-      })
-    } catch (error) {
-      console.info("WebXR isn't available on this device")
-    }
   }
 
   private async render(): Promise<void> {
