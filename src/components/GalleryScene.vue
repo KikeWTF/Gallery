@@ -6,6 +6,10 @@
     <h1 class="text name">GALLERY</h1>
     <p class="text description">Interactive & immersive exhibition of my certs</p>
   </div>
+
+  <div class="mobile">
+    <h1>Unfortunately,<br />the gallery is not available on mobile devices.</h1>
+  </div>
 </template>
 
 <style scoped>
@@ -54,6 +58,36 @@ canvas {
 .welcome .description {
   font-size: 2rem;
   font-weight: 500;
+}
+.mobile {
+  display: none;
+}
+
+@media screen and (max-width: 900px) {
+  canvas,
+  .welcome {
+    display: none;
+  }
+
+  .mobile {
+    z-index: 5;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    color: #56585e;
+    background-color: #f5f9ff;
+    padding: 50px 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  h1 {
+    font-size: 2rem;
+    text-align: center;
+  }
 }
 </style>
 
