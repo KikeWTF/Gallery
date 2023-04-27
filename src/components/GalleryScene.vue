@@ -256,7 +256,7 @@ class Metaverse {
     // load the scene
     const { meshes } = await SceneLoader.ImportMeshAsync(
       '',
-      '/models/gallery/',
+      './models/gallery/',
       'scene.gltf',
       this.scene,
       (evt) => {
@@ -298,13 +298,13 @@ class Metaverse {
   }
 
   private initSounds(): void {
-    new Sound('jazz', '/audio/background.mp3', this.scene, null, {
+    new Sound('jazz', './audio/background.mp3', this.scene, null, {
       loop: true,
       autoplay: true,
       volume: 0.2
     })
 
-    new Sound('footsteps', '/audio/footsteps.mp3', this.scene, null, {
+    new Sound('footsteps', './audio/footsteps.mp3', this.scene, null, {
       loop: true,
       autoplay: false
     })
